@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customized Ticket System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fef6f2; /* لون متناسق مع الشعار */
+            color: #4b2e2d; /* لون النص */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            text-align: center;
+            background-color: #f8eae6; /* لون متناسق مع الشعار */
+            padding: 20px;
+        }
+
+        header img {
+            max-width: 150px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            width: 400px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #d9cbc9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #4b2e2d;
+        }
+
+        input, select, button {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #d9cbc9;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4b2e2d;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3e2725;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="./images.jpg" alt="Logo"> <!-- شعار الشركة -->
+        <h1>New Ticket System</h1>
+    </header>
+    <form id="emailForm">
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" placeholder="Enter your name" required>
+
+        <label for="recipientName">Recipient Name:</label>
+<input type="text" id="recipientName" placeholder="Enter recipient name" required>
+
+<label for="issue">Select Issue:</label>
+        <select id="issue" required>
+            <option value="rush_forward">Rush (Forward)</option>
+            <option value="cancel_order">Cancel Order</option>
+            <option value="fake_update">Fake Update</option>
+            <option value="rush_return">Rush (Return)</option>
+        </select>
+
+        <label for="policyNumber">Tracking Number:</label>
+        <input type="text" id="policyNumber" placeholder="Enter tracking number" required>
+
+        <label for="email">Enter Your Email (From):</label>
+        <input type="email" id="email" placeholder="Enter your email (must be @gmail.com)" pattern=".+@gmail\.com" required>
+
+        <label for="receiver">Enter Receiver Email(s) (To):</label>
+        <input type="text" id="receiver" placeholder="Enter receiver email(s), separated by commas" required>
+
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" placeholder="Subject will be auto-filled" readonly>
+
+        <label for="attachments">Attachments (Optional):</label>
+        <input type="file" id="attachments" multiple>
+
+        <button type="submit">Send Email</button>
+    </form>
+
+    <script>
+        // This script updates the subject field based on the selected issue
+        document.getElementById('issue').addEventListener('change', function() {
+            const issue = this.value;
+            let subject = '';
+
+            switch(issue) {
+                case 'rush_forward':
+                    subject = 'Urgent Forwarding Request: Rush Order for Immediate Delivery Order NO.';
+                    break;
+                case 'cancel_order':
+                    subject = 'Request for Order Cancellation Order NO.';
+                    break;
+                case 'fake_update':
+                    subject = 'Urgent Assistance Required: Fake Tracking Update for Order NO.';
+                    break;
+                case 'rush_return':
+                    subject = 'Urgent Return Request for Immediate Processing Order NO.';
+                    break;
+                default:
+                    subject = 'General Inquiry';
+            }
+
+            document.getElementById('subject').value = subject;
+        });
+
+        // Placeholder for email form submission logic
+        document.getElementById('emailForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const issue = document.getElementById('issue').value;
+            const policyNumber = document.getElementById('policyNumber').value;
+            const fromEmail = document.getElementById('email').value;
+            const toEmails = document.getElementById('receiver').value.split(',');
+            const attachments = document.getElementById('attachments').files;
+
+            // Validate receiver emails
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            for (let email of toEmails) {
+                if (!emailPattern.test(email.trim())) {
+                    alert(`Invalid email address: ${email}`);
+                    return;
+                }
+            }
+
+            // Attachments are optional, so no need to validate
+
+            const ccEmails = [
+                'abdelrahman.osama.pepla@gmail.com',
+                'hassan.ahmed.pepla@gmail.com',
+                'amremad.pepla@gmail.com',
+                'mostafahussein.pepla@gmail.com',
+                'farah@pepla.store'
+            ];
+            
+            const emailBodyTemplates = {
+                rush_forward: `Dear ${recipientName},
+
+I hope you are doing well.
+
+I am reaching out to request urgent forwarding for a rush order that requires immediate delivery. The tracking number for this shipment is ${policyNumber}, and it is critical that it reaches the customer as soon as possible.
+
+Please prioritize this shipment and take the necessary steps to expedite its delivery. Our customer has an urgent need for this order, and your swift action will be highly appreciated.
+
+Kindly confirm once the forwarding has been processed and provide any updates on the revised delivery schedule.
+
+Thank you for your prompt attention and support in ensuring a speedy delivery.
+
+Best regards, 
+Pepla Design Team`,
+                cancel_order: `Dear ${recipientName},
+
+I hope this message finds you well.
+
+I am writing to request the cancellation of the shipment associated with tracking number ${policyNumber}. Due to delays and issues with the tracking updates, we no longer require this order to be delivered.
+
+Kindly confirm the cancellation and let us know the next steps, including any required procedures for returning the shipment or halting its delivery.
+
+Thank you for your prompt attention to this request. Please keep us informed of any updates.
+
+Best regards, 
+Pepla Design Team`,
+                fake_update: `Dear ${recipientName},
+
+I hope this email finds you well.
+
+I am writing to bring to your attention an issue with the tracking update for one of our shipments. The tracking number ${policyNumber} shows a misleading or "fake" update, and our customer is urgently waiting for their order. This situation is causing delays, and we need to resolve it as quickly as possible.
+
+Could you please investigate this matter and provide accurate tracking information or take the necessary steps to expedite the shipment? Our customer is expecting the order as soon as possible, and we rely on your support to ensure timely delivery.
+
+We appreciate your prompt assistance in resolving this issue. Kindly update us with the current status of the shipment and any actions taken to resolve the delay.
+
+Thank you for your attention to this matter.
+
+Best regards, 
+Pepla Design Team`,
+                rush_return: `Dear ${recipientName},
+
+I hope this message finds you well.
+
+I am writing to request an urgent return of the shipment associated with tracking number ${policyNumber}. Due to specific circumstances, we need this shipment to be returned to our facility as soon as possible.
+
+Please prioritize this request and take the necessary steps to expedite the return process. It is crucial that the shipment is returned immediately, and we rely on your swift support to ensure this is handled without delay.
+
+Kindly confirm once the return process has been initiated and provide any updates on the status.
+
+Thank you for your prompt attention and assistance.
+
+Best regards, 
+Pepla Design Team`
+            };
+            
+            const emailBody = emailBodyTemplates[issue];
+            
+            if (!emailBody) {
+                alert('Unable to generate email body. Please check your input.');
+                return;
+            }
+
+            console.log('From:', fromEmail);
+            console.log('To:', toEmails);
+            console.log('CC:', ccEmails);
+            console.log('Subject:', document.getElementById('subject').value);
+            console.log('Body:', emailBody);
+
+            alert('Email prepared successfully!');
+            
+        });
+    </script>
+</body>
+</html>
